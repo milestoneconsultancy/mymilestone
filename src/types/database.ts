@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_releases: {
+        Row: {
+          created_at: string | null
+          id: string
+          notes: string | null
+          released_at: string | null
+          title: string
+          version: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          released_at?: string | null
+          title: string
+          version: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          released_at?: string | null
+          title?: string
+          version?: string
+        }
+        Relationships: []
+      }
       audit_log: {
         Row: {
           action: string
@@ -792,28 +819,21 @@ export const Constants = {
       user_role: ["owner", "admin", "recruiter", "hr", "viewer"],
     },
   },
-} as const
+} as const;
 
 
-export type UserRole = Database['public']['Enums']['user_role'];
-export type CandidateStatus = Database['public']['Enums']['candidate_status'];
-export type OfferStatus = Database['public']['Enums']['offer_status'];
-export type Company = Database['public']['Tables']['companies']['Row'];
-export type Profile = Database['public']['Tables']['profiles']['Row'] & { company?: Company };
-export type Invite = Database['public']['Tables']['invites']['Row'];
-export type Master = Database['public']['Tables']['masters']['Row'];
-export type Responsibility = Database['public']['Tables']['responsibilities']['Row'];
-export type LetterText = Database['public']['Tables']['letter_texts']['Row'];
-export type Candidate = Database['public']['Tables']['candidates']['Row'] & {
-  latest_offer?: Offer | null;
-  last_call?: CallLog | null;
-};
-export type CallLog = Database['public']['Tables']['call_logs']['Row'] & {
-  candidate?: Candidate;
-  logger_profile?: Profile;
-};
-export type Offer = Database['public']['Tables']['offers']['Row'] & {
-  candidate?: Candidate;
-};
-export type AuditLog = Database['public']['Tables']['audit_log']['Row'];
-export type TrashItem = Database['public']['Tables']['trash']['Row'];
+export type Company = Tables<"companies">;
+export type Profile = Tables<"profiles"> & { company?: Company | null };
+export type Candidate = Tables<"candidates">;
+export type CallLog = Tables<"call_logs">;
+export type Offer = Tables<"offers">;
+export type Master = Tables<"masters">;
+export type Responsibility = Tables<"responsibilities">;
+export type LetterText = Tables<"letter_texts">;
+export type TrashItem = Tables<"trash">;
+export type AppRelease = Tables<"app_releases">;
+export type Invite = Tables<"invites">;
+
+export type UserRole = Enums<"user_role">;
+export type CandidateStatus = Enums<"candidate_status">;
+export type OfferStatus = Enums<"offer_status">;
