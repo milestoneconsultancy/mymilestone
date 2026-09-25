@@ -9,3 +9,6 @@ yarn-error.log*
 .pnp.js
 next-env.d.ts
 *.tsbuildinfo
+
+.vercel
+.env*
