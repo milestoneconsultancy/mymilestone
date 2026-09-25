@@ -120,10 +120,11 @@ Only return the JSON object. Do not include markdown ticks or additional comment
         },
       });
     } catch (aiErr: any) {
-      console.warn("AI resume parsing failed, returning regex fields:", aiErr.message);
+      console.error("[/api/ai/resume error]:", aiErr?.message || aiErr);
       return NextResponse.json({
         aiOk: false,
         error: "AI busy — basic details filled",
+        aiError: aiErr?.message || "AI model failure",
         data: {
           candidate_name: null,
           gender: null,

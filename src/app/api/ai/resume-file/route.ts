@@ -86,10 +86,11 @@ Only return the JSON object. Do not include markdown ticks.
         },
       });
     } catch (aiErr: any) {
-      console.warn("Multimodal resume parsing failed:", aiErr.message);
+      console.error("[/api/ai/resume-file error]:", aiErr?.message || aiErr);
       return NextResponse.json({
         aiOk: false,
         error: "AI busy — please fill details manually",
+        aiError: aiErr?.message || "Multimodal AI model failure",
         data: {},
       });
     }

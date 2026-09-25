@@ -345,10 +345,12 @@ function NewInterviewForm() {
           showToast("AI successfully extracted resume details");
         } else {
           setAiStatus("busy");
+          showError(result.aiError || result.error || "AI busy — basic details filled");
           scheduleAutoRetry(rawText, regexFields);
         }
-      } catch (err) {
+      } catch (err: any) {
         setAiStatus("busy");
+        showError(err.message || "Failed to reach AI parsing service");
         scheduleAutoRetry(rawText, regexFields);
       }
     } else {
@@ -369,9 +371,11 @@ function NewInterviewForm() {
           showToast("AI vision parsed document successfully");
         } else {
           setAiStatus("busy");
+          showError(result.aiError || result.error || "AI vision busy — please fill details manually");
         }
-      } catch (err) {
+      } catch (err: any) {
         setAiStatus("busy");
+        showError(err.message || "Multimodal AI parsing failed");
       }
     }
 
