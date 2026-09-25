@@ -1,23 +1,26 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const MODEL_CHAIN = [
+  "gemini-2.5-flash",
   "gemini-3.1-flash-lite",
   "gemini-3.5-flash",
   "gemini-3.8-flash",
-  "gemini-2.5-flash",
-  "gemini-1.5-flash", // Extra safe fallback
 ];
+
+function getApiKey(): string {
+  const key = (process.env.GEMINI_API_KEY || "").replace(/^\uFEFF/, "").trim();
+  if (!key) {
+    throw new Error("GEMINI_API_KEY environment variable is not set");
+  }
+  return key;
+}
 
 export async function callGeminiWithFallback(
   prompt: string,
   systemInstruction?: string,
   isJson = true
 ): Promise<string> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error("GEMINI_API_KEY environment variable is not set");
-  }
-
+  const apiKey = getApiKey();
   const genAI = new GoogleGenerativeAI(apiKey);
   let lastError: any = null;
 
@@ -60,11 +63,7 @@ export async function callGeminiMultimodal(
   mimeType: string,
   isJson = true
 ): Promise<string> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error("GEMINI_API_KEY environment variable is not set");
-  }
-
+  const apiKey = getApiKey();
   const genAI = new GoogleGenerativeAI(apiKey);
   let lastError: any = null;
 
