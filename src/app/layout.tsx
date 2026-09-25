@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { LoadingProvider } from "@/components/layout/TopProgressBar";
 import { SplashScreen } from "@/components/layout/SplashScreen";
+import { VersionReloadBanner } from "@/components/layout/VersionReloadBanner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -40,6 +41,7 @@ export default function RootLayout({
         <LoadingProvider>
           <AuthProvider>
             <SplashScreen />
+            <VersionReloadBanner />
             {children}
           </AuthProvider>
         </LoadingProvider>

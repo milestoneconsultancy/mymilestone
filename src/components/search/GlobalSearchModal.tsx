@@ -25,6 +25,7 @@ export function GlobalSearchModal({
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const { company } = useAuth();
   const supabase = createClient();
@@ -50,12 +51,39 @@ export function GlobalSearchModal({
   }, [isOpen, onClose]);
 
   useEffect(() => {
+    setSelectedIndex(0);
+  }, [results]);
+
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+      } else if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setResults((currentResults) => {
+          if (currentResults.length > 0) {
+            setSelectedIndex((prev) => (prev + 1) % currentResults.length);
+          }
+          return currentResults;
+        });
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setResults((currentResults) => {
+          if (currentResults.length > 0) {
+            setSelectedIndex((prev) => (prev - 1 + currentResults.length) % currentResults.length);
+          }
+          return currentResults;
+        });
+      } else if (e.key === "Enter") {
+        if (results.length > 0 && results[selectedIndex]) {
+          e.preventDefault();
+          handleSelect(results[selectedIndex].url);
+        }
+      }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
+  }, [onClose, results, selectedIndex]);
 
   useEffect(() => {
     const q = query.trim();
@@ -231,38 +259,52 @@ export function GlobalSearchModal({
             </div>
           ) : (
             <div className="space-y-1">
-              {results.map((item) => (
-                <div
-                  key={`${item.type}-${item.id}`}
-                  onClick={() => handleSelect(item.url)}
-                  className="flex items-center justify-between p-3 rounded-xl hover:bg-blue-50/60 cursor-pointer transition-colors group"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 group-hover:bg-[#0A2E5A] group-hover:text-white transition-colors shrink-0">
-                      {item.type === "candidate" && <User className="w-4 h-4" />}
-                      {item.type === "offer" && <FileText className="w-4 h-4" />}
-                      {item.type === "master" && <Settings className="w-4 h-4" />}
-                      {item.type === "call" && <PhoneCall className="w-4 h-4" />}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-gray-800 truncate">
-                          {highlightMatch(item.title, query)}
-                        </span>
-                        {item.tag && (
-                          <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 shrink-0">
-                            {item.tag}
-                          </span>
-                        )}
+              {results.map((item, index) => {
+                const isSelected = index === selectedIndex;
+                return (
+                  <div
+                    key={`${item.type}-${item.id}`}
+                    onClick={() => handleSelect(item.url)}
+                    onMouseEnter={() => setSelectedIndex(index)}
+                    className={`flex items-center justify-between p-3 rounded-xl cursor-pointer transition-colors group ${
+                      isSelected
+                        ? "bg-blue-50/90 ring-1.5 ring-[#1B8BD8]"
+                        : "hover:bg-blue-50/60"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors shrink-0 ${
+                          isSelected
+                            ? "bg-[#0A2E5A] text-white"
+                            : "bg-gray-100 text-gray-600 group-hover:bg-[#0A2E5A] group-hover:text-white"
+                        }`}
+                      >
+                        {item.type === "candidate" && <User className="w-4 h-4" />}
+                        {item.type === "offer" && <FileText className="w-4 h-4" />}
+                        {item.type === "master" && <Settings className="w-4 h-4" />}
+                        {item.type === "call" && <PhoneCall className="w-4 h-4" />}
                       </div>
-                      <p className="text-xs text-gray-500 truncate mt-0.5">
-                        {highlightMatch(item.subtitle, query)}
-                      </p>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold text-gray-800 truncate">
+                            {highlightMatch(item.title, query)}
+                          </span>
+                          {item.tag && (
+                            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 shrink-0">
+                              {item.tag}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-500 truncate mt-0.5">
+                          {highlightMatch(item.subtitle, query)}
+                        </p>
+                      </div>
                     </div>
+                    <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#F5741A] transition-colors shrink-0 ml-2" />
                   </div>
-                  <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#F5741A] transition-colors shrink-0 ml-2" />
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
