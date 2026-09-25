@@ -70,7 +70,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-[#F3F5F9] flex flex-col justify-center items-center p-4">
       <div className="mb-6 text-center">
         <div className="w-14 h-14 bg-[#0A2E5A] rounded-2xl mx-auto flex items-center justify-center shadow-md mb-3">
-          <svg className="w-8 h-8 text-[#F5741A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg className="w-8 h-8 text-[#F5741A]" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
             <path d="M6 6h10"/>
             <path d="M6 10h10"/>
@@ -102,7 +102,7 @@ export default function LoginPage() {
             onClick={handleGoogleLogin}
             isLoading={isGoogleLoading}
           >
-            <svg className="w-4 h-4" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" width="16" height="16" viewBox="0 0 24 24">
               <path
                 fill="#4285F4"
                 d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.15z"
