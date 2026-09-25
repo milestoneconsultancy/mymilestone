@@ -5,9 +5,19 @@ import { callGeminiWithFallback } from "@/lib/gemini";
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createServerClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    let user = null;
+    const authHeader = request.headers.get("authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      const token = authHeader.substring(7);
+      const { data, error } = await supabase.auth.getUser(token);
+      if (!error && data?.user) user = data.user;
+    }
+    if (!user) {
+      const { data, error } = await supabase.auth.getUser();
+      if (!error && data?.user) user = data.user;
+    }
 
-    if (authError || !user) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

@@ -43,6 +43,7 @@ export async function middleware(request: NextRequest) {
     path.startsWith("/signup") ||
     path.startsWith("/invite") ||
     path.startsWith("/auth") ||
+    path.startsWith("/api") ||
     path.startsWith("/_next") ||
     path.startsWith("/icons") ||
     path.startsWith("/manifest.json") ||
