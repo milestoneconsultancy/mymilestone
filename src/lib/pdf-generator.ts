@@ -89,10 +89,44 @@ export async function generateOfferLetterPdf(opts: OfferPdfOptions): Promise<Buf
     console.warn("Could not embed stamp image", e);
   }
 
+  // Sanitize non-WinAnsi characters (such as Rupee symbol ₹, curly quotes, en-dash)
+  const cleanText = (str: string | null | undefined): string => {
+    if (!str) return "";
+    return String(str)
+      .replace(/₹/g, "Rs. ")
+      .replace(/[\u2018\u2019]/g, "'")
+      .replace(/[\u201C\u201D]/g, '"')
+      .replace(/[\u2013\u2014]/g, "-")
+      .replace(/\u2022/g, "-")
+      .replace(/[^\x00-\x7F]/g, "");
+  };
+
+  opts = {
+    ...opts,
+    salary: cleanText(opts.salary),
+    designation: cleanText(opts.designation),
+    candidateName: cleanText(opts.candidateName),
+    candidateAddress: cleanText(opts.candidateAddress),
+    companyName: cleanText(opts.companyName),
+    companyAddress: cleanText(opts.companyAddress),
+    reportingTo: cleanText(opts.reportingTo),
+    project: cleanText(opts.project),
+    posting: cleanText(opts.posting),
+    noticePeriod: cleanText(opts.noticePeriod),
+    responsibilities: (opts.responsibilities || []).map((r) => ({
+      title: cleanText(r.title),
+      text: cleanText(r.text),
+    })),
+    facilities: (opts.facilities || []).map((f) => ({
+      label: cleanText(f.label),
+      text: cleanText(f.text),
+    })),
+  };
+
   // Helper for placeholder replacement
   const firstName = opts.candidateName.split(" ")[0];
   const replacePlaceholders = (text: string) => {
-    return text
+    const replaced = text
       .replace(/{{NAME}}/g, opts.candidateName)
       .replace(/{{FIRST_NAME}}/g, firstName)
       .replace(/{{DESIGNATION}}/g, opts.designation)
@@ -104,6 +138,7 @@ export async function generateOfferLetterPdf(opts: OfferPdfOptions): Promise<Buf
       .replace(/{{REPORTING_TO}}/g, opts.reportingTo)
       .replace(/{{POSTING}}/g, opts.posting)
       .replace(/{{PROJECT}}/g, opts.project);
+    return cleanText(replaced);
   };
 
   // Helper to split text into wrapped lines

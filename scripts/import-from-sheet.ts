@@ -210,13 +210,13 @@ async function main() {
       mobile_no: mobileNo.replace(/\D/g, "").slice(-10) || mobileNo.trim(),
       email: email?.trim() || null,
       gender: gender?.trim() || null,
-      dob: normalizeDate(rawDob),
+      date_of_birth: normalizeDate(rawDob),
       age: parseInt(rawAge, 10) || null,
       address: address?.trim() || null,
       pincode: pincode?.replace(/\D/g, "") || null,
       position_applied_for: position?.trim() || null,
       education: education?.trim() || null,
-      experience_years: parseFloat(rawExp) || null,
+      total_experience_years: parseFloat(rawExp) || null,
       current_location: currentLocation?.trim() || null,
       current_salary: currentSalary?.trim() || null,
       expected_salary: expectedSalary?.trim() || null,
@@ -224,12 +224,18 @@ async function main() {
       final_status: finalStatus,
       joining_date: normalizeDate(rawJoiningDate),
       interview_date: normalizeDate(rawInterviewDate) || new Date().toISOString().split("T")[0],
-      resume_url: resumeLink?.startsWith("http") ? resumeLink.trim() : null,
+      resume_path: resumeLink?.startsWith("http") ? resumeLink.trim() : null,
       remarks: finalRemarks || null,
     };
 
     if (interviewNo) {
       candidatePayload.interview_no = interviewNo;
+    } else {
+      const { data: nextNum } = await supabase.rpc("next_counter", {
+        p_company: companyId,
+        p_name: "interview",
+      });
+      candidatePayload.interview_no = nextNum || idx;
     }
 
     const { error: insErr } = await supabase.from("candidates").insert(candidatePayload);
